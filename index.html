@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<body>
+  <div id="value"></div>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="./thing.js"></script>
+  <script>
+  var topic    = thing.mqttTopic;
+  var username = thing.username;
+  var password = thing.password;
+  var opts = "username=" + username + "&" + "password=" + password + "&" + "clientId=" + topic;
+  var wsURL = 'ws://localhost:8080/' + topic + '?' + opts;
+  var conn = new WebSocket(wsURL);
+  conn.onopen    = function (e)   { console.log("ws:onopen", e); };
+  conn.onerror   = function (err) { console.log('ws:onerror:', err); };
+  conn.onclose   = function (err) { console.log('ws:onclose:', err); };
+  conn.onmessage = function (e) {
+    var reader = new FileReader();
+    reader.addEventListener("loadend", function() {
+       var v = JSON.parse(reader.result)
+       console.log(v);
+       $("#value").text(v.value);
+    });
+    reader.readAsText(e.data);
+  };
+  </script>
+</body>
